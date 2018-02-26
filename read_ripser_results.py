@@ -19,7 +19,7 @@ def read_ripser_results(fname):
 
     expr_header = 'distance matrix with ([\d]*) points'
     expr_PHdim = 'persistence intervals in dim ([\d]):'
-    expr_interval = '\ \[([\d]*.[\d]*),([\d]*.[\d]*)\)'
+    expr_interval = '\ \[(.*),(.*)\)'
 
     prog_header = re.compile(expr_header)
     prog_PHdim = re.compile(expr_PHdim)
@@ -33,12 +33,14 @@ def read_ripser_results(fname):
     n = int(match.group(1))
 
     for line in lines[2:]:
+
         m = prog_PHdim.match(line)
         if m!=None:
             # initialize a new dictionary entry for the new PH dimension
             dim = int(m.group(1))
             PH_intervals[dim] = []
         else:
+
             m = prog_interval.match(line)
             left = np.double(m.group(1))
             right = np.double(m.group(2)) if m.group(2)!=' ' else np.inf
