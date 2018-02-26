@@ -27,8 +27,8 @@ Requirements
 
 Python packages:
 * numpy
-* multiprocessing
 * matplotlib
+* multiprocessing, os, subprocess (these should be built in)
 
 ...and most importantly,
-* The ripser executable, which is a C++ program and requires its own compiling.
+* The ripser executable, which is a C++ code and requires its own compiling.
