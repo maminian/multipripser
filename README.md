@@ -1,7 +1,7 @@
 What is this?
 ---
 
-This is a Python3 interface to [https://github.com/Ripser/ripser](Ripser), a fast software for 
+This is a Python3 interface to [Ripser](https://github.com/Ripser/ripser), a fast software for 
 for the computation of Vietoris–Rips persistence barcodes. This code is almost completely 
 worthless unless you already have it installed.
 
