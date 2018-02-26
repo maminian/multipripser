@@ -31,7 +31,7 @@ def run_ripser_sim(cloud,**kwargs):
     max_dim = kwargs.get('max_dim',1)
 
     cdf(cloud,fname,return_mat=False)
-    result = subprocess.check_output([ripser_loc,fname])
+    result = subprocess.check_output([ripser_loc,fname,"--dim",str(max_dim)])
 
     lines = result.decode('utf-8').split('\n')
     lines.pop(-1)   # Spare extra line
