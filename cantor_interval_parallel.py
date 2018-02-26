@@ -7,6 +7,8 @@ import numpy as np
 from matplotlib import pyplot
 import multiprocessing
 
+fpref = ri.generate_unique_id()
+
 def gen_cantor_pt(d=40):
     # d=40 corresponds to roughly 19 digits of precision.
     a = np.random.choice([0,2],d)
@@ -14,20 +16,36 @@ def gen_cantor_pt(d=40):
     return np.dot(a,b)
 #
 
-n = 1001
-pts = np.zeros((n,2))
-pts[:,0] = [gen_cantor_pt() for i in range(n)]
-pts[:,1] = np.random.rand(n)
+def gen_cantor_cross_interval(n,d=40):
+    # points on C x U([0,1])
+    pts = np.zeros((n,2))
+    pts[:,0] = [gen_cantor_pt(d=d) for i in range(n)]
+    pts[:,1] = np.random.rand(n)
+    return pts
+#
 
-def PH_realization(i):
-    cloud = pts[:i]
-    PH_intervals = ri.run_ripser_sim(cloud, max_dim=1)
+def PH_realization(inval):
+    i,rep = inval
+    fname = fpref + '_' + str(i).zfill(4) + '_' + str(rep).zfill(3) + '.txt'
+    cloud = gen_cantor_cross_interval(i)
+
+    PH_intervals = ri.run_ripser_sim(cloud, max_dim=1, fname=fname)
     print(i)
-    return PH_intervals
+    return i,PH_intervals
 #
 
 p = multiprocessing.Pool(4)
 
-results = p.map(PH_realization,np.arange(2,n, dtype=int))
+nmin = 20
+nmax = 200
+dn = 20
 
-ri.save_thing(results,'cantor_interval_1000.pkl')
+reps = 100
+
+samples = np.arange(nmin,nmax+1,20, dtype=int)
+samples = np.array([[[sample,rep] for sample in samples] for rep in np.arange(reps)])
+samples = np.reshape(samples, (samples.shape[0]*samples.shape[1],2) )
+
+results = p.map(PH_realization,samples)
+
+ri.save_thing(results,'cantor_interval_1000_reps.pkl')

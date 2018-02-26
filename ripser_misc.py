@@ -59,7 +59,7 @@ def sum_PH_bars(PH_dict,dim=0):
     '''
     import numpy as np
     lens = np.diff(PH_dict[dim]).flatten()
-    return np.mean(lens[np.isfinite(lens)])
+    return np.sum(lens[np.isfinite(lens)])
 #
 
 def save_thing(thing,fname):
