@@ -9,8 +9,8 @@ import numpy as np
 from matplotlib import pyplot
 import multiprocessing
 
-n = 1001
-pts = np.random.rand(n,2)*2 - 1.
+n = 401
+pts = np.random.rand(n,2)
 
 def PH_realization(i):
     cloud = pts[:i]
@@ -23,4 +23,4 @@ p = multiprocessing.Pool(4)
 
 results = p.map(PH_realization,np.arange(2,n, dtype=int))
 
-ri.save_thing(results,'square_1000.pkl')
+#ri.save_thing(results,'square_1000.pkl')
