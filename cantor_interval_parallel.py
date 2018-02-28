@@ -34,18 +34,19 @@ def PH_realization(inval):
     return i,PH_intervals
 #
 
-p = multiprocessing.Pool(4)
-
+nproc = 4
 nmin = 20
 nmax = 200
 dn = 20
 
 reps = 100
 
-samples = np.arange(nmin,nmax+1,20, dtype=int)
+p = multiprocessing.Pool(nproc)
+
+samples = np.arange(nmin,nmax+1,dn, dtype=int)
 samples = np.array([[[sample,rep] for sample in samples] for rep in np.arange(reps)])
 samples = np.reshape(samples, (samples.shape[0]*samples.shape[1],2) )
 
 results = p.map(PH_realization,samples)
 
-ri.save_thing(results,'cantor_interval_n200_reps100.pkl')
+ri.save_thing(results,'cantor_interval_n%i_reps%i.pkl'%(nmax,reps))

@@ -17,7 +17,9 @@ def run_ripser_sim(cloud,**kwargs):
         max_dim: maximum persistent homology dimension to compute.
             Defaults to 1.
     '''
-    from create_distmat_file import create_distmat_file as cdf
+    # from create_distmat_file import create_distmat_file as cdf
+    from create_distmat_str import create_distmat_str as cds
+    from create_distmat import create_distmat
     from read_ripser_results import read_ripser_results as rrr
     from ripser_misc import generate_unique_id as gid
 
@@ -30,8 +32,10 @@ def run_ripser_sim(cloud,**kwargs):
     save_output = kwargs.get('save_output',False)
     max_dim = kwargs.get('max_dim',1)
 
-    cdf(cloud,fname,return_mat=False)
-    result = subprocess.check_output([ripser_loc,fname,"--dim",str(max_dim)])
+    D = create_distmat(cloud)
+    Dstr = cds(D)
+    p = subprocess.Popen([ripser_loc,"--dim",str(max_dim)], stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+    result = p.communicate(input=Dstr)[0]
 
     lines = result.decode('utf-8').split('\n')
     lines.pop(-1)   # Spare extra line
@@ -41,8 +45,13 @@ def run_ripser_sim(cloud,**kwargs):
         f.write(result)
         f.close()
     #
-    if not save_input:
-        os.remove(fname)
+    # if not save_input:
+    #     os.remove(fname)
+    # #
+    if save_input:
+        f = open(fgid+'.txt','wb')
+        f.write(Dstr)
+        f.close()
     #
 
     try:
