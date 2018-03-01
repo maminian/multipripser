@@ -34,8 +34,8 @@ the PH dimensions you're interested in. It's the fastest
 tool out there (according to Wikipedia), but it's single threaded. 
 
 This code is designed to accelerate this in the situation 
-that you want to compute *many* bar codes, by changing a few things 
-in the standard pipeline of point-cloud to barcodes:
+that you want to compute bar codes for *many* point clouds, by changing 
+a few things in the standard pipeline of point-cloud to barcodes:
 * Given a point cloud, use a scikit-learn function for fast calculation of 
 the distance matrix (it also happens to be parallelized by default)
 * Skip creating the file containing the distance matrix by instead 
