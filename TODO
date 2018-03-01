@@ -1,2 +1,3 @@
-- function to parallelize create D for N points (sckikitlearn-pairwise_distances?)
-- Fixed D; compute PH for subtriangles n=2,...,N (or some subsampling)
+- Compute large fixed D; compute PH for subtriangles n=2,...,N (or some subsampling)
+  corresponding to having a fixed sequence of points and introducing more and 
+  more points, instead of taking a new realization each time.
