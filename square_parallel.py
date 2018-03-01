@@ -9,18 +9,19 @@ import numpy as np
 from matplotlib import pyplot
 import multiprocessing
 
-n = 8192
-
-def PH_realization(i):
-    cloud = np.random.rand(n,2)
+def PH_realization(inv):
+    i,rep = inv
+    cloud = np.random.rand(i,2)
     PH_intervals = ri.run_ripser_sim(cloud, max_dim=0)
-    print(i)
+    print(i,rep)
     return PH_intervals
 #
 
-p = multiprocessing.Pool(4)
+nprocs = 60
+p = multiprocessing.Pool(nprocs)
 
-samples = 2**np.arange(5,13+1)
+samples = 2**np.arange(5,13+1,0.5)
+samples = np.array(samples,dtype=int)
 reps = 100
 
 samples = np.array([[[sample,rep] for sample in samples] for rep in np.arange(reps)])
