@@ -14,7 +14,7 @@ def PH_realization(inv):
     cloud = np.random.rand(i,2)
     PH_intervals = ri.run_ripser_sim(cloud, max_dim=0)
     print(i,rep)
-    return PH_intervals
+    return i,PH_intervals
 #
 
 nprocs = 60
