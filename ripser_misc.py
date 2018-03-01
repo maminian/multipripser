@@ -83,3 +83,41 @@ def load_thing(fname):
     f.close()
     return thing
 #
+
+def export_results_to_hdf(results,fname):
+    '''
+    Dumps the results of a many-realization results into an
+    HDF file which can be read by both python and matlab.
+    '''
+    import h5py
+    import numpy as np
+
+    h = h5py.File(fname,'w')
+    ns = np.array([result[0] for result in results])
+    nsu = np.unique(ns)
+
+    phs = []
+    for result in results:
+        vals = list(result[1].keys())
+        for val in vals:
+            if val not in phs:
+                phs.append(val)
+    #
+    for ph in phs:
+        h.create_group('/PH_%i'%ph)
+    #
+
+    counter = np.zeros(ns.shape)
+    for i,result in enumerate(results):
+        nsuu = result[0]
+        which = np.where(nsuu==nsu)[0][0]
+        bddict = result[1]
+        phs = list(bddict.keys())
+        for j,ph in enumerate(phs):
+            dsetname = '/PH_%i/n%i_%i'%(ph,nsuu,counter[which])
+            print(dsetname)
+            h.create_dataset(dsetname, data=bddict[ph])
+            counter[which]+=1
+        #
+    #
+#

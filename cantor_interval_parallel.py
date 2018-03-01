@@ -60,6 +60,8 @@ print(len(samples))
 
 p = multiprocessing.Pool(nproc)
 
+samples = np.arange(nmin,nmax+1,dn, dtype=int)
+
 samples = np.array([[[sample,rep] for sample in samples] for rep in np.arange(reps)])
 samples = np.reshape(samples, (samples.shape[0]*samples.shape[1],2) )
 
