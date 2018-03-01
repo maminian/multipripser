@@ -31,7 +31,7 @@ Ripser takes in text files for input; preferably the lower triangle of a
 distance matrix in csv (comma seperated values) format. The output 
 is to stdout (the terminal) listing out birth/death times for 
 the PH dimensions you're interested in. It's the fastest 
-thing out there, but it's single threaded. 
+tool out there (according to Wikipedia), but it's single threaded. 
 
 This code is designed to accelerate this in the situation 
 that you want to compute *many* bar codes, by changing a few things 
@@ -44,6 +44,11 @@ is that hard drive read/writes are slow)
 * The output is parsed using regular expressions and stored 
 in a dictionary format, with keys being dimensions; values being arrays 
 containing the barcode intervals. 
+* When you want to do many simulations of point clouds sampled from 
+the same probability density, there are scripts here demonstrating 
+how to parallelize this. In the future the interface might be further 
+streamlined; where all one would need would be a function which 
+samples from the distribution and a list of sample points to do.
 
 Some other things in here...
 ---
