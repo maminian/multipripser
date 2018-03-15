@@ -1,5 +1,5 @@
 # Attempting to take increasing
-# sets of points sampled from [-1,1]x[-1,1]
+# sets of points sampled from [0,1]x[0,1]
 # and parallelize the calculation of *average edge length*
 # for PH^0.
 #

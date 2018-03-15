@@ -10,3 +10,5 @@ from create_distmat_str import create_distmat_str
 from read_ripser_results import read_ripser_results
 from run_ripser_sim import run_ripser_sim
 from ripser_misc import *
+from gen_pt_cloud_from_measure import *
+import test_measures
