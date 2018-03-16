@@ -1,4 +1,4 @@
-def single_sequence_scaling(measure,nmax,seq=[],**kwargs):
+def single_sequence_scaling(measure,nmax,**kwargs):
     '''
     This script generates ONE point cloud and goes through
     the usual process of generating data for a log-log plot,
@@ -26,41 +26,45 @@ def single_sequence_scaling(measure,nmax,seq=[],**kwargs):
 
     '''
     import re
-    import ripser_interface as ri
-    import subprocess,os
     import multiprocessing
+    import ripser_interface as ri
+
 
     ripser_loc = kwargs.get('ripser_loc','../ripser/ripser')
     max_dim = kwargs.get('max_dim',1)
     nprocs = kwargs.get('nprocs',1)
+    seq = kwargs.get('seq',[i+2 for i in range(nmax-2+1)])
 
-    def submit_subset(i):
-        p = subprocess.Popen([ripser_loc,"--dim",str(max_dim)], stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
-        result = p.communicate(input=Dstr)[0]
-
-        lines = result.decode('utf-8').split('\n')
-        lines.pop(-1)   # Spare extra line
-        try:
-            PH_intervals = rrr(lines)
-            return PH_intervals
-        except:
-            print('There was an error parsing the results; returning the raw result.')
-            return lines
-        #
-    #
-
-    if len(seq)==0:
-        seq = [i+2 for i in range(nmax-2+1)]
-    #
-
-    p = multiprocessing.Pool(nprocs)
-
-    pts = ri.gen_pt_cloud_from_measure(measure,nmax,**kwargs)
+    # pts = ri.gen_pt_cloud_from_measure(measure,nmax,**kwargs)
+    pts = ri.gen_pt_cloud_from_measure(measure,nmax)
     D = ri.create_distmat(pts)
     Dstr = ri.create_distmat_str(D)
+
+    p = multiprocessing.Pool(nprocs)
 
     iterobj = re.finditer(b'.*\\n.*',Dstr)
     locs = [i.start() for i in iterobj]
 
+    all_inputs = [[ripser_loc,max_dim,Dstr[:locs[seq[j]-1]]] for j in range(len(seq)) ]
 
+    results = p.map(submit_string_ripser, all_inputs)
+
+    return {seq[i]:results[i] for i in range(len(seq))}
+
+#
+
+def submit_string_ripser(inputs):
+    import subprocess
+    import ripser_interface as ri
+
+    ripser_loc,max_dim,Dstr_in = inputs
+
+    proc = subprocess.Popen([ripser_loc,"--dim",str(max_dim)], stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+    result = proc.communicate(input=Dstr_in)[0]
+
+    lines = result.decode('utf-8').split('\n')
+    lines.pop(-1)   # Spare extra line
+
+    PH_intervals = ri.read_ripser_results(lines)
+    return PH_intervals
 #

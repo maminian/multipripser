@@ -12,3 +12,4 @@ from run_ripser_sim import run_ripser_sim
 from ripser_misc import *
 from gen_pt_cloud_from_measure import *
 import test_measures
+from single_sequence_scaling import *
