@@ -1,4 +1,4 @@
-import sierpinsky as sp
+from . import sierpinski as sp
 import numpy as np
 from matplotlib import pyplot
 

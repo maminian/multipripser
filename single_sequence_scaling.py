@@ -1,4 +1,4 @@
-def single_sequence_scaling(measure,nmax,**kwargs):
+def single_sequence_scaling(measure,npoints,**kwargs):
     '''
     This script generates ONE point cloud and goes through
     the usual process of generating data for a log-log plot,
@@ -17,8 +17,6 @@ def single_sequence_scaling(measure,nmax,**kwargs):
             with. Default: [2,3,...,npoints].
         nprocs: Number of processes to use for the parallelization (default: 1)
 
-        All other inputs are passed to the measure function.
-
     Outputs:
         results: A dictionary with keys being number of points;
             values being dictionaries of bar codes in the number
@@ -33,10 +31,10 @@ def single_sequence_scaling(measure,nmax,**kwargs):
     ripser_loc = kwargs.get('ripser_loc','../ripser/ripser')
     max_dim = kwargs.get('max_dim',1)
     nprocs = kwargs.get('nprocs',1)
-    seq = kwargs.get('seq',[i+2 for i in range(nmax-2+1)])
+    seq = kwargs.get('seq',[i+2 for i in range(npoints-2+1)])
 
-    # pts = ri.gen_pt_cloud_from_measure(measure,nmax,**kwargs)
-    pts = ri.gen_pt_cloud_from_measure(measure,nmax)
+    # pts = ri.gen_pt_cloud_from_measure(measure,npoints,**kwargs)
+    pts = ri.gen_pt_cloud_from_measure(measure,npoints)
     D = ri.create_distmat(pts)
     Dstr = ri.create_distmat_str(D)
 
@@ -45,7 +43,7 @@ def single_sequence_scaling(measure,nmax,**kwargs):
     iterobj = re.finditer(b'.*\\n.*',Dstr)
     locs = [i.start() for i in iterobj]
 
-    all_inputs = [[ripser_loc,max_dim,Dstr[:locs[seq[j]-1]]] for j in range(len(seq)) ]
+    all_inputs = [[seq[j],max(seq),ripser_loc,max_dim,Dstr[:locs[seq[j]-1]]] for j in range(len(seq)) ]
 
     results = p.map(submit_string_ripser, all_inputs)
 
@@ -57,7 +55,7 @@ def submit_string_ripser(inputs):
     import subprocess
     import ripser_interface as ri
 
-    ripser_loc,max_dim,Dstr_in = inputs
+    j,maxseq,ripser_loc,max_dim,Dstr_in = inputs
 
     proc = subprocess.Popen([ripser_loc,"--dim",str(max_dim)], stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
     result = proc.communicate(input=Dstr_in)[0]
@@ -66,5 +64,6 @@ def submit_string_ripser(inputs):
     lines.pop(-1)   # Spare extra line
 
     PH_intervals = ri.read_ripser_results(lines)
+    print(j,maxseq)
     return PH_intervals
 #

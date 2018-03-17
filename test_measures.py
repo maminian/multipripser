@@ -10,7 +10,7 @@ from numpy.linalg import norm
 maxr2d = sqrt(1./pi)            # Radius for area one disk
 maxr3d = (3./(4.*pi))**(1./3)   # Radius for volume one sphere
 
-# Stuff for sierpinsky
+# Stuff for sierpinski
 sf = sqrt(4./sqrt(3))/2.
 v0 = sf*array([1,0])
 v1 = sf*array([0.5,sqrt(3)/2.])
@@ -98,14 +98,14 @@ def sample_piecewise(curve):
     Given a list of points defining the vertices of a piecewise linear
     curve, sample a point uniformly from the curve.
     '''
-    n = len(curve)
+    n = len(curve)-1
     t = n*interval()
     v0 = int(t)
     v1 = v0+1
     return list(curve[v0] + (t-v0)*(array(curve[v1])-array(curve[v0])))
 #
 
-def sierpinsky_v1(d=60):
+def sierpinski_v1(d=60):
     '''
     Samples points from the Sierpinski triangle.
     More precisely, samples points

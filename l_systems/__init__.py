@@ -1,2 +1,2 @@
-import sierpinsky_ternary
-import sierpinsky_randomsamp
+from . import sierpinski_ternary
+from . import sierpinski
