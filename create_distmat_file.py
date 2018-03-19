@@ -7,6 +7,7 @@ def create_distmat_file(D,fname):
     f = open(fname,'w')
 
     for i in range(n):
+        line = ''
         for j in range(i):
             line += '%.15f,'%D[i,j]
         #
