@@ -27,6 +27,9 @@ def single_sequence_scaling(measure,npoints,**kwargs):
     import multiprocessing
     import ripser_interface as ri
 
+    global ripser_loc
+    global max_dim
+    global Dstr
 
     ripser_loc = kwargs.get('ripser_loc','../ripser/ripser')
     max_dim = kwargs.get('max_dim',1)
@@ -36,6 +39,7 @@ def single_sequence_scaling(measure,npoints,**kwargs):
     # pts = ri.gen_pt_cloud_from_measure(measure,npoints,**kwargs)
     pts = ri.gen_pt_cloud_from_measure(measure,npoints)
     D = ri.create_distmat(pts)
+
     Dstr = ri.create_distmat_str(D)
 
     p = multiprocessing.Pool(nprocs)
@@ -43,7 +47,7 @@ def single_sequence_scaling(measure,npoints,**kwargs):
     iterobj = re.finditer(b'.*\\n.*',Dstr)
     locs = [i.start() for i in iterobj]
 
-    all_inputs = [[seq[j],max(seq),ripser_loc,max_dim,Dstr[:locs[seq[j]-1]]] for j in range(len(seq)) ]
+    all_inputs = [[seq[j],max(seq),locs[seq[j]-1]] for j in range(len(seq)) ]
 
     results = p.map(submit_string_ripser, all_inputs)
 
@@ -55,10 +59,10 @@ def submit_string_ripser(inputs):
     import subprocess
     import ripser_interface as ri
 
-    j,maxseq,ripser_loc,max_dim,Dstr_in = inputs
+    j,maxseq,cutoff = inputs
 
     proc = subprocess.Popen([ripser_loc,"--dim",str(max_dim)], stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
-    result = proc.communicate(input=Dstr_in)[0]
+    result = proc.communicate(input=Dstr[:cutoff])[0]
 
     lines = result.decode('utf-8').split('\n')
     lines.pop(-1)   # Spare extra line

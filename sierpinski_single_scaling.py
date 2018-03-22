@@ -7,7 +7,7 @@ import numpy as np
 # Parameters
 #
 nprocs = 3
-npoints = 1000
+npoints = 8192
 seq = np.arange(20,npoints+1,20)
 
 # Generate the curve approximating sierpinski
