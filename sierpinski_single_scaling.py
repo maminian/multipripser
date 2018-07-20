@@ -6,13 +6,16 @@ import numpy as np
 #
 # Parameters
 #
-nprocs = 3
-npoints = 8192
-seq = np.arange(20,npoints+1,20)
+nprocs = 1
+# npoints = 8192
+# seq = np.arange(20,npoints+1,20)
+seq = np.array( 1.5**np.arange(8,24), dtype=int)
+# seq = np.array( 1.5**np.arange(8,20), dtype=int)
+npoints = seq.max()
 
 # Generate the curve approximating sierpinski
 # at a given scale. Use even numbers.
-level = 2
+level = 6
 
 #############################################
 

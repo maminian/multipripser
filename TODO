@@ -1,3 +1,4 @@
-- Compute large fixed D; compute PH for subtriangles n=2,...,N (or some subsampling)
-  corresponding to having a fixed sequence of points and introducing more and 
-  more points, instead of taking a new realization each time.
+! Shuffle the sequence of points in single_sequence_scaling
+so that memory is distributed better throughout the
+running (large and small problems get mixed in to the same
+worker in the Pool)
