@@ -102,6 +102,9 @@ def plot_PH_summary(PH_dict,**kwargs):
     Optional inputs:
         max_dim : maximum homologogical dimension to bother with.
             Default: all in the dictionary are used.
+        filtration_bounds: interval [fmin,fmax] of filtration
+            values to plot. Default: automatically determined
+            from PH_dict to show all barcodes with a bit of padding.
     '''
     import numpy as np
     from matplotlib import pyplot
@@ -112,6 +115,8 @@ def plot_PH_summary(PH_dict,**kwargs):
     keeps = np.where(dims <= kwargs.get('max_dim',np.inf))[0]
     dims = dims[keeps]
     dims.sort()
+
+    filtration_bounds = kwargs.get('filtration_bounds', [])
 
     ndims = len(dims)
     # NOTE: code will break with more than 10 dimensions.
@@ -199,8 +204,13 @@ def plot_PH_summary(PH_dict,**kwargs):
         ypos -= new_heights[i] + inter_pad
     #
 
+
+
     # Put in labels for each barcode.
     for i,d in enumerate(dims):
+        if len(filtration_bounds)>0:
+            ax[i].set_xlim(filtration_bounds)
+        #
         ax[i].text(0,1, 'Persistence intervals in dimension %i:'%d, ha='left', va='bottom', fontsize=14, transform=ax[i].transAxes)
     #
 
