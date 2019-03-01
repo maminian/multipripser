@@ -50,7 +50,7 @@ def plot_PH_results(arr,**kwargs):
     dh = (yr-yl)/n
     r = 0.1 # Relative padding between consecutive intervals
 
-    rh = dh-r*dh
+    rh = dh-r*dhsm
     fig,ax = pyplot.subplots(1,1)
 
     dolater = []
@@ -188,7 +188,7 @@ def plot_PH_summary(PH_dict,**kwargs):
     top_pad = 0.1
     remainder = 1. - bottom_pad - top_pad - inter_pad*(ndims-1)
 
-    barcounts = [len(PH_dict[d]) for d in dims]
+    barcounts = [max( len(PH_dict[d]), 2) for d in dims] # edge case of 1 bar isn't visible
     new_heights = np.array(barcounts)/np.sum(barcounts)*remainder
 
     ypos = 1. - top_pad
