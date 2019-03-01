@@ -40,6 +40,7 @@ def run_ripser_sim(cloud,**kwargs):
     from ripser_misc import generate_unique_id as gid
 
     import subprocess,os
+    import numpy as np
 
     fgid = gid()
     fname = kwargs.get('fname',fgid+'.txt')
