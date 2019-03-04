@@ -19,16 +19,16 @@ def read_ripser_results(fname,**kwargs):
         lines = fname
     #
 
-    if input_type=='distance matrix':
-        expr_header = 'distance matrix with ([\d]*) points'
-    elif input_type=='point cloud':
-        # print(input_type)
-        expr_header = 'point cloud with ([\d]*) points in dimension'
-    #
+    # if input_type=='distance matrix':
+    #     expr_header = 'distance matrix with ([\d]*) points'
+    # elif input_type=='point cloud':
+    #     # print(input_type)
+    #     expr_header = 'point cloud with ([\d\/]*) points in dimension'
+    # #
     expr_PHdim = 'persistence intervals in dim ([\d]):'
-    expr_interval = '\ \[(.*),(.*)\)'
+    expr_interval = '\ \[(.*),(.*)[\]\(]{1,}'
 
-    prog_header = re.compile(expr_header)
+#    prog_header = re.compile(expr_header)
     prog_PHdim = re.compile(expr_PHdim)
     prog_interval = re.compile(expr_interval)
 
@@ -36,11 +36,10 @@ def read_ripser_results(fname,**kwargs):
         # return m.group(1),m.group(2)
 
     PH_intervals = {}
-    match = prog_header.match(lines[0])
-    n = int(match.group(1))
 
-    # import pdb
-    # pdb.set_trace()
+    # Don't actually need this
+#    match = prog_header.match(lines[0])
+#    n = int(match.group(1))
 
     for line in lines[2:]:
         if re.match('value range', line):
