@@ -26,7 +26,7 @@ def read_ripser_results(fname,**kwargs):
     #     expr_header = 'point cloud with ([\d\/]*) points in dimension'
     # #
     expr_PHdim = 'persistence intervals in dim ([\d]):'
-    expr_interval = '\ \[(.*),(.*)[\]\(]{1,}'
+    expr_interval = '\ [\[\(]{1,}(.*),(.*)[\]\)]{1,}'
 
 #    prog_header = re.compile(expr_header)
     prog_PHdim = re.compile(expr_PHdim)
