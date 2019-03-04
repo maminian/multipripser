@@ -2,3 +2,16 @@
 so that memory is distributed better throughout the
 running (large and small problems get mixed in to the same
 worker in the Pool)
+
+! Another pass through all the scripts;
+listing Purpose/Inputs/Outputs/Optional Inputs;
+removing unnecessary baggage
+
+! Cleaning up the entire interface; functions are 
+spread over many files and ripser_interface 
+is just a mess of importing all of them.
+
+! Examining the ripser pypi package; how much of 
+what we're doing here is now redundant/inefficient?
+It's probably okay if we only provide some visualization tools.
+This interface is pretty janky, after all.

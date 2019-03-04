@@ -5,12 +5,25 @@ This is a Python3 interface to [Ripser](https://github.com/Ripser/ripser), a fas
 for the computation of Vietoris–Rips persistence barcodes. This code is almost completely 
 worthless unless you already have it installed.
 
+![preview](ri_ex2_figure.png)
+
 Why do this?
 ---
 
 Ripser is not multithreaded, as far as I can tell. For a particular project I'm working, 
 barcodes over many realizations of probability densities ae needed. 
 So, I'd like to parallelize it using the multiprocessing package.
+
+That said, as of March 4, 2019 I notice that there is now a 
+ripser python package on PyPI;
+
+https://pypi.org/project/ripser/
+
+Some investigation is needed to see if it's any better/worse 
+compared to what we're doing in terms of speed, visualization, 
+etc. Wouldn't be surprised if they did the "smart" thing and 
+compiled the ripser code directly and interfaced in a better 
+way instead of working with an external ripser binary.
 
 Requirements
 ---
