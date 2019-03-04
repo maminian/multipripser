@@ -99,17 +99,31 @@ def plot_PH_summary(PH_dict,**kwargs):
     dimensions in an n-by-1 plot, which has a single
     horizontal axis of filtration values.
 
+    Inputs:
+        PH_dict : a dictionary whose keys are homological dimensions
+            and values are numpy arrays specifying birth/death times 
+            of intervals. 
+
     Optional inputs:
         max_dim : maximum homologogical dimension to bother with.
             Default: all in the dictionary are used.
         filtration_bounds: interval [fmin,fmax] of filtration
             values to plot. Default: automatically determined
             from PH_dict to show all barcodes with a bit of padding.
+
+    Outputs:
+        fig,ax : a matplotlib.pyplot Figure/Axis pair which plots 
+            the 
     '''
     import numpy as np
     from matplotlib import pyplot
     from matplotlib import patches
-    import pdb
+#    import pdb
+    
+
+    if not isinstance(PH_dict, dict):
+        raise ValueError('The input to this function must be a Python dictionary '+
+            'whose keys are homological dimensions and values are persistence intervals.')
 
     dims = np.array(list(PH_dict.keys()))
     keeps = np.where(dims <= kwargs.get('max_dim',np.inf))[0]
