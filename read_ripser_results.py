@@ -1,15 +1,25 @@
-def read_ripser_results(fname,**kwargs):
+def read_ripser_results(fname):
     '''
-    Reads the raw output of ripser and returns
-    a data structure with the results in a useable format.
+    Purpose: reads the raw output of ripser and returns
+        a dictionary with the results in a useable format.
 
-    if input is of type list, it's assumed the file has already
-    been read, and this is a list of the lines in the output.
+    Inputs:
+        fname : Can be either a string indicating a file on disk 
+            containing the output of a ripser call,
+            or a list of strings containing the lines from reading a ripser call.
+
+    Outputs:
+        PH_intervals : A dictionary whose keys are homological 
+            dimensions and corresponding entries are numpy arrays 
+            where each row is a birth/death interval for a feature.
+
+            If for some reason parsing the input fails, the output 
+            will be a list of strings containing the lines of the 
+            output from ripser.
+
     '''
     import re
     import numpy as np
-
-    input_type = kwargs.get('input_type', 'distance matrix')
 
     if type(fname)==str:
         f = open(fname,'r')
@@ -19,32 +29,21 @@ def read_ripser_results(fname,**kwargs):
         lines = fname
     #
 
-    # if input_type=='distance matrix':
-    #     expr_header = 'distance matrix with ([\d]*) points'
-    # elif input_type=='point cloud':
-    #     # print(input_type)
-    #     expr_header = 'point cloud with ([\d\/]*) points in dimension'
-    # #
     expr_PHdim = 'persistence intervals in dim ([\d]):'
     expr_interval = '\ [\[\(]{1,}(.*),(.*)[\]\)]{1,}'
 
-#    prog_header = re.compile(expr_header)
     prog_PHdim = re.compile(expr_PHdim)
     prog_interval = re.compile(expr_interval)
 
-        # m = prog.match(string)
-        # return m.group(1),m.group(2)
-
     PH_intervals = {}
-
-    # Don't actually need this
-#    match = prog_header.match(lines[0])
-#    n = int(match.group(1))
 
     for line in lines[2:]:
         if re.match('value range', line):
+            # This is a line describing the range of epsilons measured.
+            # Expected that this is a header line. Skip to the next line.
             continue
         #
+
         m = prog_PHdim.match(line)
         if m!=None:
             # initialize a new dictionary entry for the new PH dimension
@@ -70,7 +69,3 @@ def read_ripser_results(fname,**kwargs):
     return PH_intervals
 #
 
-
-if __name__=="__main__":
-    PH_intervals = read_ripser_results('results.txt')
-    fig,ax = plot_PH_results(PH_intervals[0])
