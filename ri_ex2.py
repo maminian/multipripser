@@ -14,6 +14,11 @@ from mpl_toolkits.mplot3d import Axes3D
 # fast distance matrix
 from sklearn import metrics
 
+######################
+#
+# make the cloud of points
+#
+
 n = 201
 t = np.linspace(0,2*np.pi,n)
 cloud = np.zeros((n,3))
@@ -29,13 +34,19 @@ for i,tv in enumerate(t):
     cloud[i] += 0.02*np.random.randn(3)
 #
 
+######################
+#
+# main calculation of persistence intervals via ripser
+#
+
 PH_intervals = ri.run_ripser_sim(cloud, max_dim=2)
 
 fig,ax = ri.plot_PH_summary(PH_intervals, show=False)
 
 ######################
 #
-# let's get fancy: plot the point cloud in three dimensions on the left.
+# let's get fancy: plot the point cloud in three dimensions on the left
+# with some extra doodads.
 #
 
 # Apologies; subplots_adjust seems to tamper with the y-positioning
@@ -59,11 +70,10 @@ epsilon = birth # certainly could choose other points in this interval
 
 D = metrics.pairwise_distances(cloud, metric='euclidean')
 
-# Make a dictionary to be used for plotting.
+# Collect the neighbor information associated 
+# with this value of epsilon, to be usd for plotting.
 locs = np.where(D <= epsilon)
 indices = [ locs[1][ np.where(locs[0]==row)[0] ]  for row in np.unique(locs[0]) ]
-
-
 
 for j,row in enumerate(indices):
     eh = np.setdiff1d(row, [j])
@@ -72,6 +82,7 @@ for j,row in enumerate(indices):
         axl.plot(vec[:,0], vec[:,1], vec[:,2], c='r', lw=0.5, alpha=0.4)
 #
 
+# Setting the axis view and saving...
 axl.set_xlim([-1,1])
 axl.set_ylim([-1,1])
 axl.set_zlim([-1,1])
@@ -79,5 +90,5 @@ axl.set_zlim([-1,1])
 axl.view_init(elev=45.)
 
 fig.show()
-fig.savefig('ri_ex2_figure.png', dpi=120, bbox_inches='tight')
+#fig.savefig('ri_ex2_figure.png', dpi=120, bbox_inches='tight')
 
