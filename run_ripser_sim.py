@@ -1,7 +1,21 @@
 def run_ripser_sim(cloud,**kwargs):
     '''
-    Calls create_distmat_file, calls ripser, gets the results,
-    returns the PH_intervals dictionary.
+    Purpose: Runs a ripser simulation based on the input. 
+        The input can be one of two things:
+
+        - An n-by-d array, interpreted as n points in d dimensions, 
+          where the distance matrix will be built internally using 
+          the two-norm as a metric.
+        - An n-by-n array, which will be interpreted 
+          as a distance matrix. In the rare situation that you  
+          have a point cloud with the same number of points as 
+          dimensionality (i.e., d=n), you may pass the optional 
+          argument "cloud=True" to force the first behavior.
+
+    Once the distance matrix is formed, a call to ripser is made,
+    and the function returns a dictionary with the cleaned 
+    birth/death intervals for the homology dimensions requested 
+    (default: up to dimension one).
 
     optional arguments:
         fname: intermediate file's name. Used for running in parallel
@@ -16,6 +30,8 @@ def run_ripser_sim(cloud,**kwargs):
             Defaults to False.
         max_dim: maximum persistent homology dimension to compute.
             Defaults to 1.
+        cloud: True/False flag to override the internal logic 
+            to distinguish between point cloud and distance matrix input. (default: False)
     '''
     # from create_distmat_file import create_distmat_file as cdf
     from create_distmat_str import create_distmat_str as cds
@@ -24,6 +40,7 @@ def run_ripser_sim(cloud,**kwargs):
     from ripser_misc import generate_unique_id as gid
 
     import subprocess,os
+    import numpy as np
 
     fgid = gid()
     fname = kwargs.get('fname',fgid+'.txt')
@@ -32,7 +49,14 @@ def run_ripser_sim(cloud,**kwargs):
     save_output = kwargs.get('save_output',False)
     max_dim = kwargs.get('max_dim',1)
 
-    D = create_distmat(cloud)
+    n,d = np.shape(cloud)
+    if n==d and kwargs.get('cloud',False):
+        # assume the input is a distance matrix.
+        D = cloud
+    else:
+        D = create_distmat(cloud)
+    #
+
     Dstr = cds(D)
     p = subprocess.Popen([ripser_loc,"--dim",str(max_dim)], stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
     result = p.communicate(input=Dstr)[0]
@@ -44,10 +68,7 @@ def run_ripser_sim(cloud,**kwargs):
         f = open(fgid+'_results.txt','wb')
         f.write(result)
         f.close()
-    #
-    # if not save_input:
-    #     os.remove(fname)
-    # #
+
     if save_input:
         f = open(fgid+'.txt','wb')
         f.write(Dstr)
