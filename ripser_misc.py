@@ -5,7 +5,8 @@ def generate_unique_id():
     Makes a "unique" id, to be used for filenames to avoid overlap with
     parallel computation.
     '''
-    prefix = str(time.mktime(time.localtime())+time.clock())
+    #prefix = str(time.mktime(time.localtime())+time.clock())
+    prefix = str(time.mktime(time.localtime()))
     suffix = '_'+str(random.randint(100))
     out = prefix+suffix
     return ''.join(str(out).split('.')) # Removes decimal points
