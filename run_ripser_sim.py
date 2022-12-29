@@ -1,4 +1,4 @@
-def run_ripser_sim(cloud,**kwargs):
+def run_ripser_sim(cloud, use_ripser_pypi=False, **kwargs):
     '''
     Purpose: Runs a ripser simulation based on the input. 
         The input can be one of two things:
@@ -28,26 +28,45 @@ def run_ripser_sim(cloud,**kwargs):
         save_output: Boolean; whether to keep the file from the calculation
             or just delete it after calculation.
             Defaults to False.
-        max_dim: maximum persistent homology dimension to compute.
+        maxdim: maximum persistent homology dimension to compute.
             Defaults to 1.
         cloud: True/False flag to override the internal logic 
             to distinguish between point cloud and distance matrix input. (default: False)
     '''
     # from create_distmat_file import create_distmat_file as cdf
-    from create_distmat_str import create_distmat_str as cds
-    from create_distmat import create_distmat
-    from read_ripser_results import read_ripser_results as rrr
     from ripser_misc import generate_unique_id as gid
-
+    
+    maxdim = kwargs.get('maxdim',1)
+    
+    from create_distmat import create_distmat
+    
+    # If the user has the ripser pypi installed, 
+    # we can bypass the majority of the effort 
+    # below. Really - I should just abandon this 
+    # dumb repo.
+    if use_ripser_pypi:
+        import ripser
+        D = create_distmat(cloud)
+        obj = ripser.ripser(D, distance_matrix=True, maxdim=maxdim)
+        return obj
+    
+    #########
+    
+    from create_distmat_str import create_distmat_str as cds
+    from read_ripser_results import read_ripser_results as rrr
+    
     import subprocess,os
     import numpy as np
 
+    ####
+    # Load/set remaining kwargs
     fgid = gid()
     fname = kwargs.get('fname',fgid+'.txt')
     ripser_loc = kwargs.get('ripser_loc','../ripser/ripser')
     save_input = kwargs.get('save_input',False)
     save_output = kwargs.get('save_output',False)
-    max_dim = kwargs.get('max_dim',1)
+    #######
+
 
     n,d = np.shape(cloud)
     if n==d and kwargs.get('cloud',False):
@@ -58,7 +77,7 @@ def run_ripser_sim(cloud,**kwargs):
     #
 
     Dstr = cds(D)
-    p = subprocess.Popen([ripser_loc,"--dim",str(max_dim)], stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen([ripser_loc,"--dim",str(maxdim)], stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
     result = p.communicate(input=Dstr)[0]
 
     lines = result.decode('utf-8').split('\n')

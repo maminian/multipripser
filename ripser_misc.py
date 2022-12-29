@@ -17,7 +17,7 @@ def plot_PH_results(arr,**kwargs):
     Makes the traditional PH plot using the given
     array of birth/death times (n-by-2).
 
-    Returns a fig,ax pair and does a pyplot.show(block=False).
+    Returns a fig,ax pair.
 
     optional arguments:
         plot_infinite_bar: True by default.
@@ -36,7 +36,7 @@ def plot_PH_results(arr,**kwargs):
     '''
     import numpy as np
     from matplotlib import pyplot
-    from matplotlib import patches
+    from matplotlib import patches, collections
 
     filt_range = kwargs.get('filt_range', [])
 
@@ -51,10 +51,12 @@ def plot_PH_results(arr,**kwargs):
     dh = (yr-yl)/n
     r = 0.1 # Relative padding between consecutive intervals
 
-    rh = dh-r*dhsm
+    #rh = dh-r*dhsm # huh?
+    rh = dh - r*dh
     fig,ax = pyplot.subplots(1,1)
 
     dolater = []
+    mypatches = []
 
     for i,interval in enumerate(arr):
         l,r = interval
@@ -64,8 +66,10 @@ def plot_PH_results(arr,**kwargs):
             rw = r-l
             # Rectangular patches are given as (left,bottom), width, height.j
             # print((l,i*dh), rw, rh)
-            ax.add_patch(patches.Rectangle( (l,i*dh), rw, rh ))
+            #ax.add_patch(patches.Rectangle( (l,i*dh), rw, rh ))
+            mypatches.append( patches.Rectangle( (l,i*dh), rw, rh ) )
         #
+        #coll_finite = collections.PolyCollection(mypatches_finite)
     #
 
     inds = np.isfinite(arr[:,1])
@@ -85,12 +89,18 @@ def plot_PH_results(arr,**kwargs):
             i,(l,r) = thing
             r_repl = xr+1
             rw = r_repl - l
-            ax.add_patch(patches.Rectangle( (l,i*dh), rw, rh ))
+            #ax.add_patch(patches.Rectangle( (l,i*dh), rw, rh ))
+            mypatches.append( patches.Rectangle( (l,i*dh), rw, rh ) )
+        #coll = collections.
+        #ax.add_collection( mypatches )
     #
+    
+    coll = collections.PatchCollection(mypatches, match_original=True)
+    ax.add_collection(coll)
 
     ax.set_xlim([xl,xr])
 
-    pyplot.show(block=False)
+    #pyplot.show(block=False)
     return fig,ax
 #
 
@@ -126,8 +136,16 @@ def plot_PH_summary(PH_dict,**kwargs):
         raise ValueError('The input to this function must be a Python dictionary '+
             'whose keys are homological dimensions and values are persistence intervals.')
 
-    dims = np.array(list(PH_dict.keys()))
-    keeps = np.where(dims <= kwargs.get('max_dim',np.inf))[0]
+    if 'dgms' in PH_dict.keys():
+        # assumed straight from ripser pypi;
+        # dimension inferred based on len(results['dgms'])
+        dims = np.array(list(range(len(PH_dict['dgms']))))
+        pypi_switch = True
+    else: 
+        dims = np.array(list(PH_dict.keys()))
+        pypi_switch = False
+        
+    keeps = np.where(dims <= kwargs.get('maxdim',np.inf))[0]
     dims = dims[keeps]
     dims.sort()
 
@@ -138,7 +156,17 @@ def plot_PH_summary(PH_dict,**kwargs):
     colors = pyplot.cm.tab10(np.linspace(0,1,10))
 
     xl = 0.
-    xr = 1.1*max([np.nanmax(PH_dict[d][np.isfinite(PH_dict[d])]) for d in [0,1]])
+    
+    if pypi_switch:
+        derp = []
+        for d in dims:
+            huh = PH_dict['dgms'][d][:,1]
+            derp.append( np.nanmax( huh[np.isfinite(huh)] ) )
+        
+        maxes = np.nanmax(derp)
+        xr = 1.1*maxes
+    else:
+        xr = 1.1*max([np.nanmax(PH_dict[d][np.isfinite(PH_dict[d])]) for d in dims])
 
 
     fig,ax = pyplot.subplots(ndims,1, sharex=True, figsize=(12,2*ndims))
@@ -146,7 +174,10 @@ def plot_PH_summary(PH_dict,**kwargs):
 
     for j,d in enumerate(dims):
         # filt_range = kwargs.get('filt_range', [])
-        arr = PH_dict[d]
+        if pypi_switch:
+            arr = PH_dict['dgms'][d]
+        else:
+            arr = PH_dict[d]
         n = len(arr)
 
         dh = 0.1
@@ -163,11 +194,12 @@ def plot_PH_summary(PH_dict,**kwargs):
             else:
                 rw = r-l
                 # Rectangular patches are given as (left,bottom), width, height.j
+                # TODO: put in a patches.PatchCollection and put in the ax outside the loop.
                 ax[j].add_patch(patches.Rectangle( (l,i*dh), rw, rh, color=colors[j]))
             #
         #
 
-        inds = np.isfinite(arr[:,1])
+        #inds = np.isfinite(arr[:,1])
         xl = 0.
 
         # intervals with infinity get treated separately
@@ -203,7 +235,10 @@ def plot_PH_summary(PH_dict,**kwargs):
     top_pad = 0.1
     remainder = 1. - bottom_pad - top_pad - inter_pad*(ndims-1)
 
-    barcounts = [max( len(PH_dict[d]), 2) for d in dims] # edge case of 1 bar isn't visible
+    if pypi_switch:
+        barcounts = [max(len(PH_dict['dgms'][d]), 2) for d in dims]
+    else:
+        barcounts = [max( len(PH_dict[d]), 2) for d in dims] # edge case of 1 bar isn't visible
     new_heights = np.array(barcounts)/np.sum(barcounts)*remainder
 
     ypos = 1. - top_pad
