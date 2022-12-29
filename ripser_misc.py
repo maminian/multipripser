@@ -116,7 +116,7 @@ def plot_PH_summary(PH_dict,**kwargs):
             of intervals. 
 
     Optional inputs:
-        max_dim : maximum homologogical dimension to bother with.
+        maxdim : maximum homologogical dimension to bother with.
             Default: all in the dictionary are used.
         filtration_bounds: interval [fmin,fmax] of filtration
             values to plot. Default: automatically determined
